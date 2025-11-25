@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo: El Enfoque Creaductivo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* PALETA ACTUALIZADA: VIOLETA CUÁNTICO */
+            --blueprint-bg: #0f111a; /* Un tono más oscuro/negro para resaltar el violeta */
+            --blueprint-line: #2d2b55; /* Líneas tirando a morado oscuro */
+            --ink: #c084fc; /* VIOLETA ELÉCTRICO */
+            --paper: #1b1b2f;
+            --text: #a8a8b3;
+            --white: #e0dbe6;
+            --grid-size: 30px;
+            --error: #ff5555;
+        }
+
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background-color: var(--blueprint-bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* FONDO TIPO PLANO (GRID) */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(var(--blueprint-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--blueprint-line) 1px, transparent 1px);
+            background-size: var(--grid-size) var(--grid-size);
+            opacity: 0.4;
+            z-index: -1;
+        }
+
+        nav {
+            background-color: rgba(15, 17, 26, 0.95);
+            border-bottom: 2px solid var(--ink);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 5px 20px rgba(192, 132, 252, 0.15); /* Sombra violeta suave */
+            z-index: 10;
+        }
+
+        .nav-title {
+            color: var(--ink);
+            font-size: 1.4em;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(192, 132, 252, 0.4);
+        }
+
+        .nav-buttons { display: flex; gap: 10px; }
+
+        .nav-btn {
+            background: transparent;
+            border: 1px solid var(--ink);
+            color: var(--ink);
+            padding: 8px 16px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.3s;
+            text-transform: uppercase;
+            font-size: 0.9em;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background: rgba(192, 132, 252, 0.15);
+            box-shadow: 0 0 15px rgba(192, 132, 252, 0.25);
+            font-weight: bold;
+            color: #fff;
+        }
+
+        main {
+            flex: 1;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .content-view {
+            display: none;
+            width: 100%;
+            height: 100%;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        .content-view.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: 2px solid var(--blueprint-line);
+            background: #fff; 
+            border-radius: 4px;
+            filter: contrast(95%);
+        }
+
+        /* --- JUEGO CREADUCTIVO --- */
+        .game-container {
+            background-color: var(--paper);
+            border: 1px solid var(--ink);
+            padding: 40px;
+            max-width: 800px;
+            width: 90%;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            position: relative;
+            overflow-y: auto;
+            border-radius: 6px;
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px dashed var(--text);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            color: var(--white);
+        }
+
+        .context-box {
+            background: rgba(192, 132, 252, 0.05); /* Fondo violeta muy sutil */
+            padding: 20px;
+            border-left: 4px solid var(--ink);
+            margin-bottom: 25px;
+        }
+
+        .choice-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            background: transparent;
+            border: 1px solid var(--blueprint-line);
+            color: var(--text);
+            text-align: left;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 1.1em;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .choice-btn:hover {
+            border-color: var(--ink);
+            color: var(--white);
+            background: rgba(192, 132, 252, 0.1);
+            padding-left: 20px;
+            box-shadow: -5px 0 10px rgba(192, 132, 252, 0.1);
+        }
+        
+        .choice-btn::before {
+            content: ">>";
+            position: absolute;
+            left: 5px;
+            opacity: 0;
+            color: var(--ink);
+            transition: 0.3s;
+        }
+        
+        .choice-btn:hover::before { opacity: 1; }
+
+        #feedback-area {
+            margin-top: 20px;
+            padding: 15px;
+            text-align: center;
+            display: none;
+            font-size: 1em;
+            border: 1px solid;
+            border-radius: 4px;
+        }
+
+        .hidden { display: none !important; }
+
+        .highlight { color: var(--ink); font-weight: bold; }
+
+        /* Scrollbar personalizado para el violeta */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--paper); }
+        ::-webkit-scrollbar-thumb { background: var(--blueprint-line); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--ink); }
+
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="nav-title">CREATION_ENGINE // CREADUCTION</div>
+        <div class="nav-buttons">
+            <button class="nav-btn active" onclick="switchTab('presentation')">Presentación</button>
+            <button class="nav-btn" onclick="switchTab('document')">Documento</button>
+            <button class="nav-btn" onclick="switchTab('video')">Video</button>
+            <button class="nav-btn" onclick="switchTab('game')">Simulación</button>
+        </div>
+    </nav>
+
+    <main>
+        <div id="view-presentation" class="content-view active">
+            <iframe src="about:blank"></iframe>
+            <div style="position:absolute; top:50%; color:#000; font-weight:bold;">[ FRAME PDF: PRESENTACIÓN ]</div>
+        </div>
+
+        <div id="view-document" class="content-view">
+            <iframe src="about:blank"></iframe>
+            <div style="position:absolute; top:50%; color:#000; font-weight:bold;">[ FRAME PDF: DOCUMENTO INVESTIGACIÓN ]</div>
+        </div>
+
+        <div id="view-video" class="content-view">
+             <div style="width:100%; height:100%; background:#0b0c12; border: 2px solid var(--blueprint-line); display:flex; justify-content:center; align-items:center; color:var(--ink); flex-direction:column;">
+                <iframe width="1536" height="562" src="https://www.youtube.com/embed/cFeFsp2Q8s4" title="Teoría del potencial creativo de Torrance" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            </div>
+        </div>
+
+        <div id="view-game" class="content-view">
+            <div class="game-container">
+                <div class="game-header">
+                    <span>FASE: <span id="phase-indicator" class="highlight">1/3</span></span>
+                    <span>PROTOCOLO: <span class="highlight">GÉNESIS DE ARTEFACTO</span></span>
+                </div>
+
+                <p style="color: var(--ink); margin-bottom: 5px;">> ESCENARIO OPERATIVO:</p>
+                <div class="context-box">
+                    <h3 id="context-title" style="margin-top:0; color:var(--white)"></h3>
+                    <p id="context-text" style="margin: 0; line-height: 1.5;"></p>
+                </div>
+
+                <p style="color: var(--ink); margin-bottom: 10px;">> SELECCIONA ESTRATEGIA:</p>
+                <div id="options-container"></div>
+
+                <div id="feedback-area"></div>
+                <button id="next-btn" class="nav-btn hidden" style="width: 100%; margin-top: 20px;" onclick="nextLevel()">INICIAR SIGUIENTE ITERACIÓN >></button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- NAVEGACIÓN ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.content-view').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('view-' + tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // --- LÓGICA DEL JUEGO: EL CASO DE LAS VACUNAS (Torrance/Creaducción) ---
+        const phases = [
+            {
+                title: "Fase 1: La Anomalía (Origen Cognitivo)",
+                text: "Año 2020. Un patógeno desconocido paraliza el mundo. No hay inmunidad previa. No hay 'Estado del Arte' específico. Las bases de datos históricas (Inducción) son insuficientes para predecir el comportamiento.",
+                options: [
+                    "Buscar en registros de 1918 (Gripe Española) y replicar sus protocolos sanitarios exactamente.",
+                    "Admitir el vacío de conocimiento y usar la imaginación creativa para concebir una solución sin precedentes."
+                ],
+                correctIndex: 1,
+                feedback: {
+                    correct: "CORRECTO. La Creaducción nace cuando la inducción falla. Se activa la 'Teleología Creativa': crear algo nuevo (creare) para conducirlo al éxito.",
+                    wrong: "ERROR DE ENFOQUE. Eso es una analogía inductiva débil. El problema es estructuralmente nuevo; mirar al pasado no resolverá el futuro."
+                }
+            },
+            {
+                title: "Fase 2: Incubación e Iluminación",
+                text: "Torrance sugiere 'Pensamiento Divergente'. Tienes una idea radical: No usar el virus. Usar su código genético (ARNm) para que el propio cuerpo fabrique la defensa. Es arriesgado y nunca se ha hecho a escala.",
+                options: [
+                    "Descartar la idea por falta de antecedentes probados. Ir a lo seguro (vacuna atenuada).",
+                    "Incubar la idea (Torrance). Protegerla del juicio prematuro y diseñar un vehículo lipídico para hacerla viable (Ducere)."
+                ],
+                correctIndex: 1,
+                feedback: {
+                    correct: "EXCELENTE. Has protegido la idea en su fase frágil (Incubación) y has diseñado el 'cómo' (Praxeología) para hacerla real.",
+                    wrong: "FALLO. El pensamiento convergente prematuro ha matado la innovación. Sin riesgo creativo, no hay creaducción."
+                }
+            },
+            {
+                title: "Fase 3: Materialización y Fecundidad",
+                text: "La idea funciona en el laboratorio. Pero la Creaducción exige impacto real. ¿Cómo mides el éxito final de tu investigación?",
+                options: [
+                    "Por la elegancia teórica de la fórmula química en el papel.",
+                    "Por la capacidad de producir millones de dosis (Materialización) y que otros puedan replicar el proceso (Reproducibilidad)."
+                ],
+                correctIndex: 1,
+                feedback: {
+                    correct: "SISTEMA VALIDADO. Has completado el ciclo: Imaginación -> Conducción -> Artefacto Tangible -> Fecundidad (salvar vidas).",
+                    wrong: "ERROR. La Creaducción no es arte abstracto. Es ingeniería de soluciones. Sin reproducibilidad y efecto tangible, no es ciencia."
+                }
+            }
+        ];
+
+        let currentPhase = 0;
+
+        function loadPhase() {
+            const gameContainer = document.querySelector('.game-container');
+            
+            if(currentPhase >= phases.length) {
+                gameContainer.innerHTML = `
+                    <div style="text-align:center; padding:20px;">
+                        <h1 style="color:var(--ink); text-shadow: 0 0 15px var(--ink);">ARTEFACTO DESPLEGADO</h1>
+                        <p style="color:var(--white)">Has demostrado competencia en el enfoque Creaductivo.</p>
+                        <div style="border: 1px solid var(--ink); padding: 15px; margin-top:20px; background:rgba(192, 132, 252, 0.05);">
+                            Estado Final: <span style="color:var(--ink); font-weight:bold;">FECUNDIDAD CREATIVA ACTIVA</span>
+                        </div>
+                        <button class="nav-btn" style="margin-top:20px;" onclick="location.reload()">REINICIAR SIMULACIÓN</button>
+                    </div>`;
+                return;
+            }
+
+            const phase = phases[currentPhase];
+            document.getElementById('phase-indicator').innerText = `${currentPhase + 1}/${phases.length}`;
+            document.getElementById('context-title').innerText = phase.title;
+            document.getElementById('context-text').innerText = phase.text;
+            
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            
+            phase.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn';
+                btn.innerText = opt;
+                btn.onclick = () => checkAnswer(index);
+                container.appendChild(btn);
+            });
+
+            document.getElementById('feedback-area').style.display = 'none';
+            document.getElementById('next-btn').classList.add('hidden');
+        }
+
+        function checkAnswer(index) {
+            const phase = phases[currentPhase];
+            const fb = document.getElementById('feedback-area');
+            const btns = document.querySelectorAll('.choice-btn');
+            
+            btns.forEach(b => {
+                b.disabled = true;
+                b.style.opacity = '0.5';
+                b.style.cursor = 'not-allowed';
+            });
+            
+            fb.style.display = 'block';
+            
+            if(index === phase.correctIndex) {
+                fb.style.border = '1px solid var(--ink)';
+                fb.style.backgroundColor = 'rgba(192, 132, 252, 0.1)';
+                fb.style.color = 'var(--ink)';
+                fb.innerHTML = `<strong>>> ANÁLISIS CORRECTO</strong><br>${phase.feedback.correct}`;
+                document.getElementById('next-btn').classList.remove('hidden');
+            } else {
+                fb.style.border = '1px solid var(--error)';
+                fb.style.backgroundColor = 'rgba(255, 85, 85, 0.1)';
+                fb.style.color = '#ffaaaa';
+                fb.innerHTML = `<strong>>> FALLO EN EL MÉTODO</strong><br>${phase.feedback.wrong}<br><br><small>Reinicando fase de prueba...</small>`;
+                
+                setTimeout(() => {
+                    loadPhase();
+                }, 3500);
+            }
+        }
+
+        function nextLevel() {
+            currentPhase++;
+            loadPhase();
+        }
+
+        loadPhase();
+    </script>
+</body>
+</html>

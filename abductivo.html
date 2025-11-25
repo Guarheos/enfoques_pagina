@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo: El Enfoque Abductivo</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ffb000; /* Ámbar Retro */
+            --bg: #100f05;
+            --panel: #1a170a;
+            --text: #ffeebb;
+            --scanline: rgba(255, 176, 0, 0.05);
+        }
+
+        body {
+            font-family: 'VT323', 'Courier New', monospace;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- EFECTO CRT (Monitor Viejo) --- */
+        body::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        nav {
+            background-color: var(--panel);
+            border-bottom: 2px solid var(--primary);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 3;
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        .nav-title {
+            color: var(--primary);
+            font-size: 1.5em;
+            text-transform: uppercase;
+            text-shadow: 0 0 5px var(--primary);
+        }
+
+        .nav-buttons { display: flex; gap: 10px; }
+
+        .nav-btn {
+            background: rgba(255, 176, 0, 0.1);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 8px 15px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 1.1em;
+            transition: 0.2s;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background-color: var(--primary);
+            color: #000;
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        main {
+            flex: 1;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .content-view {
+            display: none;
+            width: 100%;
+            height: 100%;
+        }
+
+        .content-view.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: 1px solid var(--primary);
+            background-color: #000;
+        }
+
+        /* --- ESTILOS DE LA REJILLA DE VIDEO (NUEVO) --- */
+        .video-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr;
+            gap: 20px;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        .video-wrapper {
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--primary);
+            padding: 10px;
+            background: rgba(255, 176, 0, 0.05);
+        }
+
+        .video-label {
+            margin-bottom: 8px;
+            color: var(--primary);
+            text-transform: uppercase;
+            border-bottom: 1px dashed var(--primary);
+            font-size: 1.2em;
+        }
+
+        @media (max-width: 800px) {
+            .video-grid { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
+        }
+
+        /* --- ESTILOS DEL JUEGO DETALLADO (ORIGINAL) --- */
+        .game-container {
+            background-color: var(--panel);
+            border: 2px solid var(--primary);
+            padding: 30px;
+            max-width: 800px;
+            width: 90%;
+            box-shadow: 0 0 30px rgba(255, 176, 0, 0.2);
+            overflow-y: auto; /* Por si el texto es muy largo */
+        }
+
+        .alert-box {
+            border: 2px dashed var(--primary);
+            padding: 15px;
+            margin-bottom: 20px;
+            background: rgba(255, 176, 0, 0.05);
+        }
+
+        .knowledge-base {
+            font-size: 0.9em;
+            color: #ccc;
+            margin-bottom: 20px;
+            padding-left: 10px;
+            border-left: 3px solid #666;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+        }
+
+        .hypothesis-btn {
+            display: block;
+            width: 100%;
+            margin: 10px 0;
+            padding: 15px;
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--text);
+            text-align: left;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 1.1em;
+            transition: 0.2s;
+        }
+
+        .hypothesis-btn:hover {
+            background: var(--primary);
+            color: #000;
+        }
+
+        #feedback-area {
+            margin-top: 20px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid;
+            display: none;
+            font-size: 1.1em;
+        }
+
+        .hidden { display: none !important; }
+
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="nav-title">SYS_DIAGNOSTICS // ABDUCTION</div>
+        <div class="nav-buttons">
+            <button class="nav-btn active" onclick="switchTab('presentation')">Presentación</button>
+            <button class="nav-btn" onclick="switchTab('document')">Documento</button>
+            <button class="nav-btn" onclick="switchTab('video')">Videos (2)</button>
+            <button class="nav-btn" onclick="switchTab('game')">Simulación</button>
+        </div>
+    </nav>
+
+    <main>
+        <div id="view-presentation" class="content-view active">
+            <iframe src="assets/presentacion_abductiva.pdf"></iframe>
+        </div>
+
+        <div id="view-document" class="content-view">
+            <iframe src="assets/paper_abductivo.pdf"></iframe>
+        </div>
+
+        <div id="view-video" class="content-view">
+            <div class="video-grid">
+                <div class="video-wrapper">
+                    <div class="video-label">FUENTE A:</div>
+                    <iframe src="https://www.youtube.com/embed/7lWTMcyQjUU?si=placeholder" title="Video 1" allowfullscreen></iframe>
+                </div>
+                <div class="video-wrapper">
+                    <div class="video-label">FUENTE B:</div>
+                    <iframe src="https://www.youtube.com/embed/zERfm_bp4s8?si=placeholder" title="Video 2" allowfullscreen></iframe>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-game" class="content-view">
+            <div class="game-container">
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                    <span>INCIDENTE ACTIVO: #<span id="case-id">001</span></span>
+                    <span id="score-display">ACIERTOS: 0</span>
+                </div>
+
+                <div class="alert-box">
+                    <strong style="color:var(--primary)">[!] SÍNTOMA OBSERVADO:</strong>
+                    <div id="observation-text" style="font-size:1.2em; margin-top:5px;">Cargando...</div>
+                </div>
+
+                <div class="knowledge-base">
+                    <strong style="color: #fff">BASE DE CONOCIMIENTO (Contexto):</strong>
+                    <div id="context-text" style="margin-top:5px;">Cargando...</div>
+                </div>
+
+                <p style="text-align:center; margin-bottom:10px;">SELECCIONA LA MEJOR EXPLICACIÓN (HIPÓTESIS):</p>
+                
+                <div id="options-container">
+                    </div>
+
+                <div id="feedback-area"></div>
+                <button id="next-btn" class="nav-btn hidden" style="width:100%; margin-top:15px" onclick="nextCase()">SIGUIENTE INCIDENTE >></button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function switchTab(tabId) {
+            document.querySelectorAll('.content-view').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('view-' + tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // --- LÓGICA ABDUCTIVA (VERSION DETALLADA) ---
+        const cases = [
+            {
+                id: "001",
+                observation: "El servidor Web responde con error '504 Gateway Timeout' después de 60 segundos.",
+                context: "Sabemos que el servidor de Base de Datos está bajo mantenimiento programado justo ahora.",
+                options: [
+                    "Hipótesis: Un hacker ha borrado el archivo index.html.",
+                    "Hipótesis: El servidor Web no puede conectar con la Base de Datos a tiempo.", // Mejor explicación
+                    "Hipótesis: El cable de red del servidor Web está desconectado."
+                ],
+                correctIndex: 1,
+                explanation: "Correcto. Aunque un cable desconectado causa fallos, el contexto del mantenimiento en la BD hace que el timeout por falta de respuesta sea la mejor explicación."
+            },
+            {
+                id: "002",
+                observation: "Un usuario reporta que su computadora está extremadamente lenta y los ventiladores suenan al máximo.",
+                context: "El Administrador de Tareas muestra un proceso llamado 'xmr_wkr' usando 99% de CPU.",
+                options: [
+                    "Hipótesis: La computadora está vieja y necesita limpieza.",
+                    "Hipótesis: Se ha infectado con un minero de criptomonedas.", // Mejor explicación
+                    "Hipótesis: El usuario tiene demasiadas pestañas de Chrome abiertas."
+                ],
+                correctIndex: 1,
+                explanation: "Inferencia exitosa. 'xmr' suele referirse a Monero (crypto). El alto uso de CPU + nombre del proceso apunta a malware de minería como la causa más probable."
+            },
+            {
+                id: "003",
+                observation: "No se puede acceder a la red Wi-Fi de la oficina. El SSID (nombre de red) ha desaparecido.",
+                context: "Hubo un corte de luz en el edificio hace 5 minutos.",
+                options: [
+                    "Hipótesis: El Router se reinició y aún está cargando el sistema.", // Mejor explicación
+                    "Hipótesis: Alguien hackeó el router y cambió el nombre a 'Invisible'.",
+                    "Hipótesis: Todas las tarjetas de red de las computadoras se quemaron."
+                ],
+                correctIndex: 0,
+                explanation: "Correcto. Ante un corte de luz reciente, la explicación más simple y probable es un reinicio en curso, no un ataque masivo coordinado."
+            },
+            {
+                id: "004",
+                observation: "Al intentar hacer 'git push', recibes el error: 'Permission denied (publickey)'.",
+                context: "Acabas de formatear tu PC y reinstalar el sistema operativo.",
+                options: [
+                    "Hipótesis: GitHub se ha caído a nivel mundial.",
+                    "Hipótesis: Te han expulsado del proyecto.",
+                    "Hipótesis: No has generado/subido tu nueva llave SSH a GitHub." // Mejor explicación
+                ],
+                correctIndex: 2,
+                explanation: "Exacto. El contexto de 'formatear PC' implica que las llaves antiguas se borraron. La falta de llave nueva es la inferencia lógica."
+            }
+        ];
+
+        let currentCase = 0;
+        let score = 0;
+
+        function loadCase() {
+            if (currentCase >= cases.length) {
+                document.querySelector('.game-container').innerHTML = `
+                    <h2 style="text-align:center; color:var(--primary)">DIAGNÓSTICO FINALIZADO</h2>
+                    <p style="text-align:center; font-size:1.5em">Puntuación Final: ${score}/${cases.length}</p>
+                    <button class="nav-btn" style="width:100%" onclick="location.reload()">REINICIAR SISTEMA</button>
+                `;
+                return;
+            }
+
+            const scenario = cases[currentCase];
+            document.getElementById('case-id').innerText = scenario.id;
+            document.getElementById('observation-text').innerText = scenario.observation;
+            document.getElementById('context-text').innerText = scenario.context;
+            
+            const btnContainer = document.getElementById('options-container');
+            btnContainer.innerHTML = '';
+            
+            scenario.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'hypothesis-btn';
+                btn.innerText = opt;
+                btn.onclick = () => checkAnswer(index);
+                btnContainer.appendChild(btn);
+            });
+
+            document.getElementById('feedback-area').style.display = 'none';
+            document.getElementById('options-container').classList.remove('hidden');
+            document.getElementById('next-btn').classList.add('hidden');
+        }
+
+        function checkAnswer(index) {
+            const scenario = cases[currentCase];
+            const feedback = document.getElementById('feedback-area');
+            
+            document.getElementById('options-container').classList.add('hidden');
+            feedback.style.display = 'block';
+            document.getElementById('next-btn').classList.remove('hidden');
+
+            if (index === scenario.correctIndex) {
+                score++;
+                document.getElementById('score-display').innerText = `ACIERTOS: ${score}`;
+                feedback.style.borderColor = "#0f0";
+                feedback.innerHTML = `<strong style="color:#0f0">HIPÓTESIS ACEPTADA</strong><br>${scenario.explanation}`;
+            } else {
+                feedback.style.borderColor = "red";
+                feedback.innerHTML = `<strong style="color:red">HIPÓTESIS DESCARTADA</strong><br>Aunque es posible, no es la mejor explicación dado el contexto.`;
+            }
+        }
+
+        function nextCase() {
+            currentCase++;
+            loadCase();
+        }
+
+        // Iniciar
+        loadCase();
+    </script>
+</body>
+</html>

@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo: El Enfoque Inductivo</title>
+    <style>
+        :root {
+            --primary: #bc13fe; /* Violeta Neón (Inductivo) */
+            --bg: #050510;
+            --panel: #120f1f;
+            --text: #e0dce6;
+            --success: #00ff9d;
+            --danger: #ff2a6d;
+        }
+
+        body {
+            font-family: 'Consolas', 'Monaco', monospace; /* Fuente más "coding" */
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- BARRA DE NAVEGACIÓN --- */
+        nav {
+            background-color: var(--panel);
+            border-bottom: 2px solid var(--primary);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 0 20px rgba(188, 19, 254, 0.2);
+        }
+
+        .nav-title {
+            color: var(--primary);
+            font-weight: bold;
+            letter-spacing: 2px;
+            font-size: 1.4em;
+            text-shadow: 0 0 8px var(--primary);
+        }
+
+        .nav-buttons { display: flex; gap: 10px; }
+
+        .nav-btn {
+            background: transparent;
+            border: 1px solid rgba(188, 19, 254, 0.4);
+            color: var(--text);
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 2px;
+            font-family: inherit;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 0 15px var(--primary);
+            border-color: var(--primary);
+        }
+
+        /* --- ÁREA DE CONTENIDO --- */
+        main {
+            flex: 1;
+            padding: 20px;
+            position: relative;
+        }
+
+        .content-view {
+            display: none;
+            width: 100%;
+            height: 100%;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .content-view.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 4px;
+            background-color: #1a1a1a;
+        }
+
+        .video-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .video-frame {
+            width: 80%;
+            height: 80%;
+            border: 2px solid var(--panel);
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- ESTILOS DEL MINIJUEGO INDUCTIVO --- */
+        
+        .game-container {
+            background-color: var(--panel);
+            border: 1px solid var(--primary);
+            padding: 30px;
+            max-width: 800px;
+            width: 90%;
+            border-radius: 4px;
+            box-shadow: 0 0 40px rgba(188, 19, 254, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .terminal-header {
+            border-bottom: 1px dashed var(--primary);
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            color: var(--primary);
+        }
+
+        .data-stream {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-left: 2px solid var(--text);
+            font-family: 'Courier New', Courier, monospace;
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .data-row {
+            opacity: 0;
+            animation: typeIn 0.5s forwards;
+            border-bottom: 1px solid #333;
+            padding-bottom: 5px;
+        }
+
+        .pattern-input-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .pattern-btn {
+            background: rgba(188, 19, 254, 0.1);
+            border: 1px solid var(--primary);
+            color: var(--text);
+            padding: 15px;
+            cursor: pointer;
+            text-align: left;
+            transition: 0.2s;
+        }
+
+        .pattern-btn:hover {
+            background: var(--primary);
+            color: black;
+        }
+
+        .feedback-overlay {
+            margin-top: 10px;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        }
+
+        @keyframes typeIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .hidden { display: none !important; }
+
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="nav-title">PATTERN_RECOGNITION // INDUCTIVE_MODE</div>
+        <div class="nav-buttons">
+            <button class="nav-btn active" onclick="switchTab('presentation')">1. Diapositivas</button>
+            <button class="nav-btn" onclick="switchTab('document')">2. Paper PDF</button>
+            <button class="nav-btn" onclick="switchTab('video')">3. Video Explicativo</button>
+            <button class="nav-btn" onclick="switchTab('game')">4. Simulación</button>
+        </div>
+    </nav>
+
+    <main>
+        
+        <div id="view-presentation" class="content-view active">
+            <iframe src="assets/presentacion_inductiva.pdf">
+                <p>No se puede mostrar el PDF. <a href="assets/presentacion_inductiva.pdf">Descargar</a></p>
+            </iframe>
+        </div>
+
+        <div id="view-document" class="content-view">
+            <iframe src="assets/paper_inductivo.pdf"></iframe>
+        </div>
+
+        <div id="view-video" class="content-view">
+            <div class="video-container">
+                <iframe width="1536" height="561" src="https://www.youtube.com/embed/ikJAJnu1P-Q" title="¿Qué es el método inductivo? Pasos, características y ejemplos" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            </div>
+        </div>
+
+        <div id="view-game" class="content-view">
+            <div class="game-container">
+                <div class="terminal-header">
+                    <span>SISTEMA: NEURAL_TRAINER_v4</span>
+                    <span id="level-display">NIVEL 1/5</span>
+                </div>
+                
+                <p style="margin: 0 0 10px 0; font-size: 0.9em; color: #888;">
+                    OBJETIVO: Analiza los datos de entrada (Observación Particular) y selecciona la regla oculta que los gobierna (Teoría General).
+                </p>
+
+                <div id="data-stream" class="data-stream">
+                    </div>
+
+                <div id="options-container" class="pattern-input-area">
+                    </div>
+
+                <div id="feedback-area" class="feedback-overlay"></div>
+                
+                <button id="next-btn" class="nav-btn hidden" style="margin-top:10px; width:100%; text-align:center;" onclick="nextLevel()">SIGUIENTE DATASET >></button>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // --- TABS LOGIC ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.content-view').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('view-' + tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // --- INDUCTIVE GAME LOGIC ---
+        /* Diferencia clave: En el deductivo tenías la regla y juzgabas el caso.
+           Aquí tienes los casos y debes ADIVINAR la regla.
+        */
+        const levels = [
+            {
+                id: 1,
+                observations: [
+                    "> INPUT: Servidor A (Linux) -> [ESTADO: OK]",
+                    "> INPUT: Servidor B (Linux) -> [ESTADO: OK]",
+                    "> INPUT: Servidor C (Windows) -> [ESTADO: FALLO]",
+                    "> INPUT: Servidor D (Linux) -> [ESTADO: OK]"
+                ],
+                options: [
+                    "Teoría: Todos los servidores funcionan correctamente.",
+                    "Teoría: Los servidores Linux son estables, los Windows están fallando.",
+                    "Teoría: El fallo es aleatorio."
+                ],
+                correctIndex: 1,
+                explanation: "Correcto. Observaste patrones repetitivos (Linux=OK, Windows=Fallo) y generalizaste una teoría sobre el sistema operativo."
+            },
+            {
+                id: 2,
+                observations: [
+                    "> Ping 192.168.1.10 (Local) -> 2ms",
+                    "> Ping 192.168.1.15 (Local) -> 3ms",
+                    "> Ping 8.8.8.8 (Google) -> 150ms",
+                    "> Ping 1.1.1.1 (Cloudflare) -> 145ms"
+                ],
+                options: [
+                    "Teoría: La red local es más rápida que la red externa.",
+                    "Teoría: Google es más lento que Cloudflare.",
+                    "Teoría: Todas las conexiones son superiores a 100ms."
+                ],
+                correctIndex: 0,
+                explanation: "Exacto. Indujiste que la ubicación de la IP (Local vs Externa) es la causa de la latencia basándote en la muestra."
+            },
+            {
+                id: 3,
+                observations: [
+                    "> Usuario 'Admin' intenta borrar tabla -> [PERMITIDO]",
+                    "> Usuario 'Guest' intenta borrar tabla -> [DENEGADO]",
+                    "> Usuario 'Ventas' intenta borrar tabla -> [DENEGADO]",
+                    "> Usuario 'Root' intenta borrar tabla -> [PERMITIDO]"
+                ],
+                options: [
+                    "Teoría: La base de datos está bloqueada para todos.",
+                    "Teoría: Solo los usuarios con privilegios altos pueden borrar datos.",
+                    "Teoría: Los usuarios con nombres de 5 letras tienen acceso."
+                ],
+                correctIndex: 1,
+                explanation: "Bien. Observaste que solo roles específicos ('Admin', 'Root') lograban la acción y formulaste una regla de privilegios."
+            },
+            {
+                id: 4,
+                observations: [
+                    "> Archivo index.html subido -> [VISIBLE]",
+                    "> Archivo style.css subido -> [VISIBLE]",
+                    "> Archivo script.js subido -> [VISIBLE]",
+                    "> Archivo config.php subido -> [OCULTO]"
+                ],
+                options: [
+                    "Teoría: El servidor oculta archivos de backend (PHP) por seguridad.",
+                    "Teoría: El servidor solo acepta archivos de imagen.",
+                    "Teoría: Todos los archivos subidos son visibles públicamente."
+                ],
+                correctIndex: 0,
+                explanation: "Correcto. Notaste que los archivos frontend (html, css, js) se comportan diferente al backend (php)."
+            },
+            {
+                id: 5,
+                observations: [
+                    "> Escaneo Puerto 80 -> ABIERTO",
+                    "> Escaneo Puerto 443 -> ABIERTO",
+                    "> Escaneo Puerto 22 -> CERRADO",
+                    "> Escaneo Puerto 21 -> CERRADO"
+                ],
+                options: [
+                    "Teoría: El servidor está totalmente apagado.",
+                    "Teoría: Es un servidor web, solo tiene puertos HTTP/HTTPS abiertos.",
+                    "Teoría: El firewall está bloqueando todo el tráfico."
+                ],
+                correctIndex: 1,
+                explanation: "Análisis completado. Usaste los datos disponibles para inducir la función del servidor (Web Server)."
+            }
+        ];
+
+        let currentLvl = 0;
+
+        function loadLevel() {
+            if(currentLvl >= levels.length) {
+                document.querySelector('.game-container').innerHTML = `
+                    <h2 style="text-align:center; color:var(--primary)">ENTRENAMIENTO COMPLETADO</h2>
+                    <p style="text-align:center">Has demostrado capacidad para generar teorías a partir de datos crudos.</p>
+                    <button class="nav-btn" style="width:100%" onclick="location.reload()">REINICIAR SISTEMA</button>
+                `;
+                return;
+            }
+
+            const lvl = levels[currentLvl];
+            document.getElementById('level-display').innerText = `NIVEL ${lvl.id}/${levels.length}`;
+            
+            // Cargar observaciones con un pequeño delay para efecto "Typing"
+            const stream = document.getElementById('data-stream');
+            stream.innerHTML = '';
+            lvl.observations.forEach((obs, index) => {
+                setTimeout(() => {
+                    stream.innerHTML += `<div class="data-row">${obs}</div>`;
+                }, index * 300);
+            });
+
+            // Cargar Botones
+            const btnContainer = document.getElementById('options-container');
+            btnContainer.innerHTML = '';
+            btnContainer.classList.remove('hidden');
+            
+            lvl.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'pattern-btn';
+                btn.innerText = opt;
+                btn.onclick = () => checkAnswer(index);
+                btnContainer.appendChild(btn);
+            });
+
+            // Resetear Feedback
+            document.getElementById('feedback-area').style.display = 'none';
+            document.getElementById('next-btn').classList.add('hidden');
+        }
+
+        function checkAnswer(selectedIndex) {
+            const lvl = levels[currentLvl];
+            const feedback = document.getElementById('feedback-area');
+            const btns = document.getElementById('options-container');
+
+            btns.classList.add('hidden'); // Ocultar opciones para mostrar resultado
+            feedback.style.display = 'block';
+            document.getElementById('next-btn').classList.remove('hidden');
+
+            if(selectedIndex === lvl.correctIndex) {
+                feedback.style.background = "rgba(0, 255, 157, 0.1)";
+                feedback.style.border = "1px solid var(--success)";
+                feedback.style.color = "var(--success)";
+                feedback.innerHTML = `STATUS: TEORÍA VALIDADA.<br><span style="font-weight:normal; font-size:0.9em">${lvl.explanation}</span>`;
+            } else {
+                feedback.style.background = "rgba(255, 42, 109, 0.1)";
+                feedback.style.border = "1px solid var(--danger)";
+                feedback.style.color = "var(--danger)";
+                feedback.innerHTML = `STATUS: TEORÍA INCORRECTA.<br>Los datos no soportan esa generalización. Intenta de nuevo en el siguiente ciclo.`;
+            }
+        }
+
+        function nextLevel() {
+            currentLvl++;
+            loadLevel();
+        }
+
+        // Iniciar
+        loadLevel();
+    </script>
+</body>
+</html>

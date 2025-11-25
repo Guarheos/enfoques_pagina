@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo: El Enfoque Retroductivo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --blueprint-bg: #0a192f;
+            --blueprint-line: #1d406b;
+            --ink: #64ffda; /* Color cian/luz */
+            --paper: #112240;
+            --text: #8892b0;
+            --white: #e6f1ff;
+            --grid-size: 30px;
+        }
+
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background-color: var(--blueprint-bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* FONDO TIPO PLANO (GRID) */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(var(--blueprint-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--blueprint-line) 1px, transparent 1px);
+            background-size: var(--grid-size) var(--grid-size);
+            opacity: 0.3;
+            z-index: -1;
+        }
+
+        nav {
+            background-color: rgba(10, 25, 47, 0.95);
+            border-bottom: 2px solid var(--ink);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            z-index: 10;
+        }
+
+        .nav-title {
+            color: var(--ink);
+            font-size: 1.4em;
+            letter-spacing: 2px;
+        }
+
+        .nav-buttons { display: flex; gap: 10px; }
+
+        .nav-btn {
+            background: transparent;
+            border: 1px solid var(--ink);
+            color: var(--ink);
+            padding: 8px 16px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.3s;
+            text-transform: uppercase;
+            font-size: 0.9em;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background: rgba(100, 255, 218, 0.1);
+            box-shadow: 0 0 10px rgba(100, 255, 218, 0.2);
+            font-weight: bold;
+        }
+
+        main {
+            flex: 1;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .content-view {
+            display: none;
+            width: 100%;
+            height: 100%;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        .content-view.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: 2px solid var(--blueprint-line);
+            background: #fff;
+            border-radius: 4px;
+        }
+
+        /* --- JUEGO RETRODUCTIVO --- */
+        .game-container {
+            background-color: var(--paper);
+            border: 1px solid var(--ink);
+            padding: 40px;
+            max-width: 800px;
+            width: 90%;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            position: relative;
+            overflow-y: auto;
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px dashed var(--text);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            color: var(--white);
+        }
+
+        .phenomenon-box {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-left: 4px solid var(--white);
+            margin-bottom: 25px;
+        }
+
+        .mechanism-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            background: transparent;
+            border: 1px solid var(--blueprint-line);
+            color: var(--text);
+            text-align: left;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 1.1em; /* Texto un poco más grande para leer bien */
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mechanism-btn:hover {
+            border-color: var(--ink);
+            color: var(--white);
+            background: rgba(100, 255, 218, 0.05);
+        }
+        
+        .mechanism-btn::before {
+            content: "[ SCAN ]";
+            position: absolute;
+            right: 10px;
+            opacity: 0;
+            color: var(--ink);
+            transition: 0.3s;
+        }
+        
+        .mechanism-btn:hover::before { opacity: 1; }
+
+        #feedback-area {
+            margin-top: 20px;
+            padding: 15px;
+            text-align: center;
+            display: none;
+            border: 1px solid;
+            font-size: 1.1em;
+        }
+
+        .hidden { display: none !important; }
+
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="nav-title">STRUCTURAL_ANALYSIS // RETRODUCTION</div>
+        <div class="nav-buttons">
+            <button class="nav-btn active" onclick="switchTab('presentation')">Presentación</button>
+            <button class="nav-btn" onclick="switchTab('document')">Paper</button>
+            <button class="nav-btn" onclick="switchTab('video')">Video</button>
+            <button class="nav-btn" onclick="switchTab('game')">Simulación</button>
+        </div>
+    </nav>
+
+    <main>
+        <div id="view-presentation" class="content-view active">
+            <iframe src="assets/presentacion_retrod.pdf"></iframe>
+        </div>
+
+        <div id="view-document" class="content-view">
+            <iframe src="assets/paper_retrod.pdf"></iframe>
+        </div>
+
+        <div id="view-video" class="content-view">
+            <iframe width="1536" height="562" src="https://www.youtube.com/embed/TO4FaaVy0Is" title="Critical Realism - Roy Bhaskar" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
+
+        <div id="view-game" class="content-view">
+            <div class="game-container">
+                <div class="game-header">
+                    <span>NIVEL DE PROFUNDIDAD: <span id="level-indicator">1/4</span></span>
+                    <span>ESTADO: ESCANEANDO...</span>
+                </div>
+
+                <p style="color: var(--ink); margin-bottom: 5px;">> FENÓMENO OBSERVADO (SUPERFICIE):</p>
+                <div class="phenomenon-box">
+                    <h2 id="phenomenon-text" style="margin: 0; color: var(--white); font-weight: normal;">Cargando...</h2>
+                </div>
+
+                <p style="color: var(--ink); margin-bottom: 10px;">> IDENTIFICA EL MECANISMO ESTRUCTURAL (CAUSA PROFUNDA):</p>
+                <div id="options-container">
+                    </div>
+
+                <div id="feedback-area"></div>
+                <button id="next-btn" class="nav-btn hidden" style="width: 100%; margin-top: 20px;" onclick="nextLevel()">ANALIZAR SIGUIENTE CAPA >></button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- PESTAÑAS ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.content-view').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('view-' + tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // --- LÓGICA RETRODUCTIVA (Casos Neutros) ---
+        /*
+           Instrucción del usuario: "no se si seria mejor marcar que pensamiento es cada respuesta"
+           Implementación: Quitamos las etiquetas (Empírico, etc) de los BOTONES.
+           El usuario debe leer la lógica. Las etiquetas aparecen solo en el FEEDBACK.
+        */
+        const levels = [
+            {
+                // CASO 1: MEDICINA/GENÉTICA (Neutro)
+                phenomenon: "En un estudio clínico, un grupo de pacientes expuestos al Virus X nunca desarrolló síntomas, a pesar de no estar vacunados.",
+                options: [
+                    "Esos pacientes simplemente tuvieron suerte y no inhalaron suficiente carga viral.",
+                    "Existe una mutación genética en sus receptores celulares (CCR5) que impide físicamente la entrada del virus.",
+                    "Seguro tomaron muchas vitaminas y eso reforzó su sistema."
+                ],
+                correctIndex: 1,
+                feedbackLabels: ["Explicación Aleatoria", "Mecanismo Estructural (Retroducción)", "Hipótesis de Sentido Común (Abducción débil)"],
+                explanation: "Correcto. La retroducción busca la estructura biológica invisible (el gen/receptor) que hace imposible la infección."
+            },
+            {
+                // CASO 2: FÍSICA (El original estaba bien)
+                phenomenon: "Al calentar agua a 100°C esta hierve, pero si subimos una montaña muy alta, hierve a 90°C.",
+                options: [
+                    "El agua de la montaña tiene minerales diferentes que cambian su punto de ebullición.",
+                    "Siempre que subimos una montaña, la temperatura baja, por eso hierve antes.",
+                    "La estructura molecular del agua requiere vencer la presión atmosférica para cambiar de estado; a menor presión, menor energía necesaria."
+                ],
+                correctIndex: 2,
+                feedbackLabels: ["Hipótesis Empírica (Errónea)", "Generalización Inductiva", "Mecanismo Físico (Retroducción)"],
+                explanation: "Exacto. No es solo un patrón, es la relación estructural entre Presión y Cambio de Estado."
+            },
+            {
+                // CASO 3: COMPUTACIÓN (El original estaba bien)
+                phenomenon: "Un software falla siempre que dos usuarios guardan datos al mismo milisegundo. El código lógico secuencial parece perfecto.",
+                options: [
+                    "El hardware subyacente carece de atomicidad en operaciones de escritura concurrente (Race Condition).",
+                    "Seguro es un virus que ataca cuando hay mucho tráfico.",
+                    "Si el código está bien escrito, es imposible que falle. Debe ser error del usuario."
+                ],
+                correctIndex: 0,
+                feedbackLabels: ["Mecanismo Estructural (Retroducción)", "Hipótesis Abductiva", "Deducción Rígida"],
+                explanation: "Bien. Fuiste más allá del código visible para encontrar la limitación estructural del sistema físico."
+            },
+            {
+                // CASO 4: GEOLOGÍA/TECTÓNICA (Corregido)
+                phenomenon: "Se han encontrado fósiles de conchas marinas y animales oceánicos en la cima de la cordillera del Himalaya (a 8,000 metros de altura).",
+                options: [
+                    "Antiguas civilizaciones debieron llevar esas conchas allá arriba como ofrendas.",
+                    "La cima de la montaña debió ser una playa hace muy poco tiempo.",
+                    "El movimiento de las placas tectónicas empujó el antiguo suelo oceánico hacia arriba durante millones de años, plegando la corteza terrestre."
+                ],
+                correctIndex: 2,
+                feedbackLabels: ["Hipótesis Improbable", "Empirismo Superficial", "Mecanismo Geológico (Retroducción)"],
+                // AQUÍ ESTABA EL ERROR:
+                explanation: "Correcto. Infieres la existencia de un mecanismo colosal (Tectónica de Placas) para explicar la presencia de lo marino en lo terrestre."
+            }
+        ];
+
+        let currentLvl = 0;
+
+        function loadLevel() {
+            if(currentLvl >= levels.length) {
+                document.querySelector('.game-container').innerHTML = `
+                    <div style="text-align:center; padding:20px;">
+                        <h1 style="color:var(--ink)">ANÁLISIS ESTRUCTURAL COMPLETADO</h1>
+                        <p>Has aprendido a ver los cimientos invisibles de la realidad.</p>
+                        <button class="nav-btn" onclick="location.reload()">REINICIAR ESCÁNER</button>
+                    </div>`;
+                return;
+            }
+
+            const lvl = levels[currentLvl];
+            document.getElementById('level-indicator').innerText = `${currentLvl + 1}/${levels.length}`;
+            document.getElementById('phenomenon-text').innerText = lvl.phenomenon;
+            
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            
+            lvl.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'mechanism-btn';
+                btn.innerText = opt;
+                btn.onclick = () => checkAnswer(index);
+                container.appendChild(btn);
+            });
+
+            document.getElementById('feedback-area').style.display = 'none';
+            document.getElementById('next-btn').classList.add('hidden');
+        }
+
+        function checkAnswer(index) {
+            const lvl = levels[currentLvl];
+            const fb = document.getElementById('feedback-area');
+            const btns = document.querySelectorAll('.mechanism-btn');
+            
+            btns.forEach(b => b.disabled = true);
+            
+            fb.style.display = 'block';
+            document.getElementById('next-btn').classList.remove('hidden');
+
+            // Feedback dinámico
+            const label = lvl.feedbackLabels[index];
+
+            if(index === lvl.correctIndex) {
+                fb.style.border = '1px solid var(--ink)';
+                fb.style.backgroundColor = 'rgba(100, 255, 218, 0.1)';
+                fb.style.color = 'var(--ink)'; // Corregido con comillas
+                fb.innerHTML = `<strong>¡EXCELENTE!</strong><br>Tipo de pensamiento: ${label}<br><br>${lvl.explanation}`;
+            } else {
+                fb.style.border = '1px solid #ff5555';
+                fb.style.backgroundColor = 'rgba(255, 85, 85, 0.1)';
+                fb.style.color = '#ffaaaa';
+                fb.innerHTML = `<strong>NO ES LA ESTRUCTURA PROFUNDA</strong><br>Tipo de pensamiento utilizado: ${label}<br><br>Intenta buscar la causa que hace *posible* el fenómeno.`;
+            }
+        }
+
+        function nextLevel() {
+            currentLvl++;
+            loadLevel();
+        }
+
+        loadLevel();
+    </script>
+</body>
+</html>
