@@ -200,28 +200,27 @@
     <nav>
         <div class="nav-title">PATTERN_RECOGNITION // INDUCTIVE_MODE</div>
         <div class="nav-buttons">
-            <button class="nav-btn active" onclick="switchTab('presentation')">1. Diapositivas</button>
-            <button class="nav-btn" onclick="switchTab('document')">2. Paper PDF</button>
-            <button class="nav-btn" onclick="switchTab('video')">3. Video Explicativo</button>
-            <button class="nav-btn" onclick="switchTab('game')">4. Simulación</button>
+            <button class="nav-btn active" onclick="switchTab('presentation')">PRESENTACIÓN</button>
+            <button class="nav-btn" onclick="switchTab('document')">DOCUMENTO</button>
+            <button class="nav-btn" onclick="switchTab('video')">VIDEO</button>
+            <button class="nav-btn" onclick="switchTab('game')">SIMULACIÓN</button>
         </div>
     </nav>
 
     <main>
         
         <div id="view-presentation" class="content-view active">
-            <iframe src="assets/presentacion_inductiva.pdf">
-                <p>No se puede mostrar el PDF. <a href="assets/presentacion_inductiva.pdf">Descargar</a></p>
+            <iframe src="src/pres/Presentacion Enfoque Inductivo.pdf">
             </iframe>
         </div>
 
         <div id="view-document" class="content-view">
-            <iframe src="assets/paper_inductivo.pdf"></iframe>
+            <iframe src="src/docs/Enfoque Inductivo.pdf"></iframe>
         </div>
 
         <div id="view-video" class="content-view">
             <div class="video-container">
-                <iframe width="1536" height="561" src="https://www.youtube.com/embed/ikJAJnu1P-Q" title="¿Qué es el método inductivo? Pasos, características y ejemplos" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                <iframe width="90%" height="90%" src="https://www.youtube.com/embed/ikJAJnu1P-Q" title="¿Qué es el método inductivo? Pasos, características y ejemplos" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
             </div>
         </div>
 

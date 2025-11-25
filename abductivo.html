@@ -25,7 +25,7 @@
             overflow: hidden;
         }
 
-        /* --- EFECTO CRT (Monitor Viejo) --- */
+        /* --- EFECTO CRT (Monitor Viejo) --- 
         body::before {
             content: " ";
             display: block;
@@ -38,7 +38,7 @@
             z-index: 2;
             background-size: 100% 2px, 3px 100%;
             pointer-events: none;
-        }
+        } */
 
         nav {
             background-color: var(--panel);
@@ -200,20 +200,20 @@
     <nav>
         <div class="nav-title">SYS_DIAGNOSTICS // ABDUCTION</div>
         <div class="nav-buttons">
-            <button class="nav-btn active" onclick="switchTab('presentation')">Presentación</button>
-            <button class="nav-btn" onclick="switchTab('document')">Documento</button>
-            <button class="nav-btn" onclick="switchTab('video')">Videos (2)</button>
-            <button class="nav-btn" onclick="switchTab('game')">Simulación</button>
+            <button class="nav-btn active" onclick="switchTab('presentation')">PRESENTACIÓN</button>
+            <button class="nav-btn" onclick="switchTab('document')">DOCUMENTO</button>
+            <button class="nav-btn" onclick="switchTab('video')">VIDEOS (2)</button>
+            <button class="nav-btn" onclick="switchTab('game')">SIMULACIÓN</button>
         </div>
     </nav>
 
     <main>
         <div id="view-presentation" class="content-view active">
-            <iframe src="assets/presentacion_abductiva.pdf"></iframe>
+            <iframe src="src/pres/Presentacion Enfoque Abductivo.pdf"></iframe>
         </div>
 
         <div id="view-document" class="content-view">
-            <iframe src="assets/paper_abductivo.pdf"></iframe>
+            <iframe src="src/docs/Enfoque Abductivo.pdf"></iframe>
         </div>
 
         <div id="view-video" class="content-view">
